@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id Int @default(autoincrement()) @id
+  username String @unique
+  password String
+  userBooks UserBooks[]
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Authors {
+  id Int @default(autoincrement()) @id
+  name String
+  birthDay DateTime
+  birthPlace String
+  bookAuthors BookAuthors[]
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BookAuthors {
+  id Int @default(autoincrement()) @id
+  authorId Int
+  author Authors @relation(fields: [authorId], references: [id])
+  bookId Int
+  book Books @relation(fields: [bookId], references: [id])
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Books {
+  id Int @default(autoincrement()) @id
+  name String
+  description String
+  datePublished DateTime
+  userBooks UserBooks[]
+  bookAuthors BookAuthors[]
+  isActive Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserBooks {
+  id Int @default(autoincrement()) @id
+  userId Int
+  user Users @relation(fields: [userId], references: [id])
+  bookId Int
+  book Books @relation(fields: [bookId], references: [id]) 
+}
