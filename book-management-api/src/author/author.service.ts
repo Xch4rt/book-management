@@ -15,7 +15,7 @@ export class AuthorService {
       const author = await this.dbService.authors.create({
         data: {
           name: name,
-          birthDay: birthDay,
+          birthDay: new Date(birthDay),
           birthPlace: birthPlace
         }
       });
@@ -38,7 +38,16 @@ export class AuthorService {
 
   async findAll() {
     try {
-      
+      const authors = await this.dbService.authors.findMany({
+        where: {
+          isActive: true
+        }
+      });
+      return {
+        status: 'success',
+        message: 'Author created successfully',
+        data: authors
+      }
     } catch (error) {
       this.logger.error("There is an error with the request", error)
       throw new HttpException("There is an error with the request", 500)
@@ -46,14 +55,92 @@ export class AuthorService {
   }
 
   async findOne(id: number) {
-    return `This action returns a #${id} author`;
+    try {
+      const author = await this.dbService.authors.findUnique({
+        where: {
+          id: id,
+          isActive: true
+        }
+      })
+
+    } catch (error) {
+      this.logger.error("There is an error with the request", error);
+      throw new HttpException("There is an error with the request", 500);
+    }
   }
 
   async update(id: number, updateAuthorDto: UpdateAuthorDto) {
-    return `This action updates a #${id} author`;
+    try {
+      const {name, birthDay, birthPlace} = updateAuthorDto;
+
+      const existAuthor = await this.dbService.authors.findUnique({
+        where: {
+          id: id,
+          isActive: true
+        }
+      });
+
+      if (!existAuthor) {
+        this.logger.error("Author does not exist");
+        throw new HttpException("Author does not exist", 404);
+      }
+
+      const author = await this.dbService.authors.update({
+        where: {
+          id: id,
+          isActive: true
+        },
+        data: {
+          name: name,
+          birthDay: new Date(birthDay),
+          birthPlace: birthPlace,
+          updatedAt: new Date()
+        }
+      });
+
+      return {
+        status: 'success',
+        message: 'Author updated succesfully',
+        data: {
+          id: author.id,
+          name: author.name,
+          updatedAt: author.updatedAt
+        }
+      }
+
+    } catch (error ) {
+      this.logger.error("There is an error with the request", error);
+      throw new HttpException("There is an error with the request", 500);
+    }
   }
 
   async remove(id: number) {
-    return `This action removes a #${id} author`;
+    try {
+      const existAuthor = await this.dbService.authors.findUnique({
+        where: {
+          id: id,
+          isActive: true
+        }
+      });
+
+      if (!existAuthor) {
+        this.logger.error("Author does not exist");
+        throw new HttpException("Author does not exist", 404);
+      }
+
+      const deleteAuthor = await this.dbService.authors.update({
+        where: {
+          id: id,
+          isActive: true
+        },
+        data: {
+          isActive: false,
+          updatedAt: new Date()
+        }
+      })
+    } catch (error) {
+      this.logger.error("There is an error with the request", error);
+      throw new HttpException("There is an error with the request", 500);
+    }
   }
 }

@@ -13,10 +13,10 @@ export class CreateAuthorDto {
 
     @ApiProperty({
         description: "Date of birth of the author",
-        type: Date
+        type: String
     })
-    @IsDate()
-    birthDay?: Date
+    @IsString()
+    birthDay?: string
 
     @ApiProperty({
         description: "Place of birth of the author",
