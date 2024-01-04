@@ -86,9 +86,9 @@ export class AuthService {
         status: 'success',
         message: 'User created successfully',
         data: {
-          id: user.id,
-          username: user.username,
-          createdAt: user.createdAt
+          id: createUser.id,
+          username: createUser.username,
+          createdAt: createUser.createdAt
         }
       }
     } catch (error) {
